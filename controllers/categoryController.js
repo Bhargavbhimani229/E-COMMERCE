@@ -27,7 +27,7 @@ module.exports.registerUser = async (req, res) => {
       return res.render("pages/login", { user });
     } else {
       console.log("Password & Confirm Password should be same!");
-      return res.render("pages/register", req.body);
+      return res.render("pages/register", { user });
     }
   } catch (error) {
     console.log(error.message);
@@ -46,7 +46,6 @@ module.exports.formPage = async (req, res) => {
       .find()
       .populate("categoryId")
       .populate("subCategoriesId");
-
     return res.render("pages/form", {
       categories,
       subcategories,
@@ -61,6 +60,7 @@ module.exports.formPage = async (req, res) => {
     });
   }
 };
+
 
 module.exports.categoryCreate = async (req, res) => {
   try {
@@ -91,16 +91,34 @@ module.exports.categoryCreate = async (req, res) => {
 module.exports.deleteCat = async (req, res) => {
   try {
     const { id } = req.params;
-   const deleteCat = await CatModel.findByIdAndDelete(id);
-   await subCatModel.deleteMany({categoryId : id})
-   await extCatModel.deleteMany({categoryId : id , subCategoriesId : id})
-    fs.unlinkSync(deleteCat.image);
+    const deleteCat = await CatModel.findByIdAndDelete(id);
+    const subcategories = await subCatModel.find({ categoryId: id });
+    const extracategories = await extCatModel.find({ categoryId: id });
+    for (let sub of subcategories) {
+      if (sub.subCatImage && fs.existsSync(sub.subCatImage)) {
+        fs.unlinkSync(sub.subCatImage);
+      }
+    }
+
+    for (let ext of extracategories) {
+      if (ext.image && fs.existsSync(ext.image)) {
+        fs.unlinkSync(ext.image);
+      }
+    }
+    await subCatModel.deleteMany({ categoryId: id });
+    await extCatModel.deleteMany({ categoryId: id });
+    if (deleteCat && deleteCat.image && fs.existsSync(deleteCat.image)) {
+      fs.unlinkSync(deleteCat.image);
+    }
+
     return res.redirect("/form");
   } catch (error) {
     console.log(error.message);
     return res.redirect("/form");
   }
 };
+
+
 
 module.exports.flipkartPage = async (req, res) => {
   try {
@@ -127,6 +145,15 @@ module.exports.flipkartPage = async (req, res) => {
 };
 
 
-module.exports.singalPage = (req,res) => {
-  return res.render("pages/singalPage");
-}
+module.exports.singalPage = async (req, res) => {
+  try {
+    const extraCategory = await extCatModel.findById(req.params.id);
+    if (!extraCategory) {
+      return res.status(404).send("Extra Category not found");
+    }
+    return res.render("pages/singalPage", { extraCategory });
+  } catch (error) {
+    console.log("Error loading single page:", error.message);
+    return res.status(500).send("Server Error");
+  }
+};

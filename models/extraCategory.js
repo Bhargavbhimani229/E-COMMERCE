@@ -4,6 +4,7 @@ const extCatSchema = new mongoose.Schema({
   name: String,
   image: String,
   rating:String,
+  price:String,
   description : String,
   categoryId : {
       type: mongoose.Schema.Types.ObjectId,

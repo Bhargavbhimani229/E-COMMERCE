@@ -5,6 +5,10 @@ Flipykart is a learning project — a simplified Flipkart-style e-commerce platf
 
 🔗 Live Demo: https://e-commerce-tofm.onrender.com
 
+Login
+userName = bhargav
+password = 123
+
 ## 📌 Features
 
 ### 👥 Client Side
@@ -42,7 +46,7 @@ Password: 123
 ## 🧾 Installation & Run Locally
 
 1. Clone the Repository
-   git clone https://github.com/yourusername/flipykart.git
+   git clone https://github.com/Bhargavbhimani229/E-COMMERCE
    cd flipykart
 
 2. Install Dependencies

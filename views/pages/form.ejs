@@ -1,0 +1,244 @@
+<%- include('../partials/header') %>
+
+<div class="page-wrapper">
+  <div class="page-breadcrumb">
+    <div class="row">
+      <div class="col-12 d-flex no-block align-items-center">
+        <h4 class="page-title">Form Basic</h4>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="text-center mb-4">Manage Categories</h2>
+
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-pills justify-content-center mb-4" id="categoryTabs" role="tablist">
+              <li class="nav-item">
+                <button class="nav-link active" id="category-tab" data-bs-toggle="tab" data-bs-target="#category" type="button" role="tab">Category</button>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link" id="subcategory-tab" data-bs-toggle="tab" data-bs-target="#subcategory" type="button" role="tab">Subcategory</button>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link" id="extra-tab" data-bs-toggle="tab" data-bs-target="#extra" type="button" role="tab">Extra Category</button>
+              </li>
+            </ul>
+
+            <div class="tab-content" id="categoryTabsContent">
+              <!-- CATEGORY TAB -->
+              <div class="tab-pane fade show active" id="category" role="tabpanel">
+                <h4>Add Category</h4>
+                <form action="/category" method="post" enctype="multipart/form-data">
+                  <div class="mb-3">
+                    <label class="form-label" for="name">Category Name</label>
+                    <input type="text" id="name" name="name" class="form-control" required />
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" for="image">Upload Image</label>
+                    <input type="file" id="image" name="image" class="form-control" required />
+                  </div>
+                  <button type="submit" class="btn btn-primary">Save Category</button>
+                </form>
+
+                <!-- Category Table -->
+                <hr />
+                <h5 class="mt-4">Category List</h5>
+                <table class="table table-bordered table-striped mt-2">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>#</th>
+                      <th>Category Name</th>
+                      <th>Image</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (categories.length === 0) { %>
+                      <tr><td colspan="4" class="text-center">No categories available.</td></tr>
+                    <% } else { %>
+                      <% categories.forEach((cat, index) => { %>
+                        <tr>
+                          <td><%= index + 1 %></td>
+                          <td><%= cat.name %></td>
+                          <td><img src="/<%= cat.image %>" width="60" /></td>
+                          <td>
+                            <a class="btn btn-sm btn-danger" href="/delete/<%= cat._id %>">Delete</a>
+                          </td>
+                        </tr>
+                      <% }) %>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- SUBCATEGORY TAB -->
+              <div class="tab-pane fade" id="subcategory" role="tabpanel">
+                <h4>Add Subcategory</h4>
+                <form action="/sub/subcategory" method="post">
+                  <div class="mb-3">
+                    <label class="form-label" for="categoryId">Select Category</label>
+                    <select id="categoryId" name="categoryId" class="form-select" required>
+                      <option value="">Choose category</option>
+                      <% categories.forEach((cat) => { %>
+                        <option value="<%= cat._id %>"><%= cat.name %></option>
+                      <% }) %>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" for="subCatName">Subcategory Name</label>
+                    <input type="text" id="subCatName" name="subCatName" class="form-control" required />
+                  </div>
+                  <button type="submit" class="btn btn-success">Save Subcategory</button>
+                </form>
+
+                <!-- Subcategory Table -->
+                <hr />
+                <h5 class="mt-4">Subcategory List</h5>
+                <table class="table table-bordered table-striped mt-2">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>#</th>
+                      <th>Subcategory Name</th>
+                      <th>Category</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (subcategories.length === 0) { %>
+                      <tr><td colspan="4" class="text-center">No subcategories found</td></tr>
+                    <% } else { %>
+                      <% subcategories.forEach((sub, index) => { %>
+                        <tr>
+                          <td><%= index + 1 %></td>
+                          <td><%= sub.subCatName %></td>
+                          <td><%= sub.categoryId ? sub.categoryId.name : 'N/A' %></td>
+                          <td>
+                            <a class="btn btn-sm btn-danger" href="/sub/delete/<%= sub._id %>">Delete</a>
+                          </td>
+                        </tr>
+                      <% }) %>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- EXTRA CATEGORY TAB -->
+              <div class="tab-pane fade" id="extra" role="tabpanel">
+                <h4>Add Extra Category</h4>
+                <form action="/ext/extra" method="post" enctype="multipart/form-data">
+                  <div class="mb-3">
+                    <label class="form-label" for="categoryIdExtra">Select Category</label>
+                    <select id="categoryIdExtra" name="categoryId" class="form-select" required>
+                      <option value="">Choose category</option>
+                      <% categories.forEach((cat) => { %>
+                        <option value="<%= cat._id %>"><%= cat.name %></option>
+                      <% }) %>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label" for="subCategoriesId">Select Subcategory</label>
+                    <select id="subCategoriesId" name="subCategoriesId" class="form-select" required>
+                      <option value="">Choose subcategory</option>
+                      <% subcategories.forEach((sub) => { %>
+                        <option value="<%= sub._id %>" data-category="<%= sub.categoryId._id %>">
+                          <%= sub.subCatName %>
+                        </option>
+                      <% }) %>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label" for="name">Extra Category Name</label>
+                    <input type="text" id="name" name="name" class="form-control" required />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label" for="image">Upload Image</label>
+                    <input type="file" id="image" name="image" class="form-control" required />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label" for="rating">Rating</label>
+                    <input type="number" id="rating" name="rating" class="form-control" required />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label" for="description">Description</label>
+                    <textarea id="description" name="description" class="form-control" required></textarea>
+                  </div>
+
+                  <button type="submit" class="btn btn-warning">Save Extra Category</button>
+                </form>
+
+                <!-- Extra Category Table -->
+                <hr />
+                <h5 class="mt-4">Extra Category List</h5>
+                <table class="table table-bordered table-striped mt-2">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>#</th>
+                      <th>Extra Category</th>
+                      <th>Category</th>
+                      <th>Subcategory</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (extracategories.length === 0) { %>
+                      <tr><td colspan="5" class="text-center">No extra categories found</td></tr>
+                    <% } else { %>
+                      <% extracategories.forEach((extra, index) => { %>
+                        <tr>
+                          <td><%= index + 1 %></td>
+                          <td><%= extra.name %></td>
+                          <td><%= extra.categoryId ? extra.categoryId.name : 'N/A' %></td>
+                          <td><%= extra.subCategoriesId ? extra.subCategoriesId.subCatName : 'N/A' %></td>
+                          <td>
+                            <a class="btn btn-sm btn-danger" href="/ext/delete/<%= extra._id %>">Delete</a>
+                          </td>
+                        </tr>
+                      <% }) %>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </div> <!-- tab-content -->
+          </div> <!-- card-body -->
+        </div> <!-- card -->
+      </div> <!-- col -->
+    </div> <!-- row -->
+  </div> <!-- container-fluid -->
+</div> <!-- page-wrapper -->
+
+<!-- Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Filtering Script -->
+<script>
+  const categorySelect = document.getElementById('categoryIdExtra');
+  const subcategorySelect = document.getElementById('subCategoriesId');
+
+  categorySelect.addEventListener('change', function () {
+    const selectedCategory = this.value;
+    const options = subcategorySelect.querySelectorAll('option');
+
+    options.forEach(option => {
+      const catId = option.getAttribute('data-category');
+      if (!catId || catId === selectedCategory) {
+        option.style.display = 'block';
+      } else {
+        option.style.display = 'none';
+      }
+    });
+
+    subcategorySelect.value = '';
+  });
+</script>
+
+<%- include('../partials/footer') %>

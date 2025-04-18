@@ -157,3 +157,7 @@ module.exports.singalPage = async (req, res) => {
     return res.status(500).send("Server Error");
   }
 };
+
+module.exports.logOut = (req,res) => {
+  return res.redirect("/login")
+}

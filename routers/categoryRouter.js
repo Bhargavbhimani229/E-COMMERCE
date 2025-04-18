@@ -26,4 +26,7 @@ catRouter.get("/",catController.flipkartPage);
 
 catRouter.get("/singalPage/:id",catController.singalPage);
 
+
+catRouter.get("/logOut",catController.logOut);
+
 module.exports = catRouter;

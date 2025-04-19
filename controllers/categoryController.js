@@ -161,3 +161,19 @@ module.exports.singalPage = async (req, res) => {
 module.exports.logOut = (req,res) => {
   return res.redirect("/login")
 }
+
+
+module.exports.allSubCat =async (req,res) => {
+  try {
+    const subCatId = req.params.id;
+    
+    const extraCategoryList = await extCatModel.find({ subCategoriesId: subCatId });
+    
+    return res.render("pages/allSubCat", {
+      extraCategories: extraCategoryList,
+    });
+  } catch (error) {
+    console.log("Error loading subcategory page:", error.message);
+    return res.status(500).send("Server Error");
+  }
+}

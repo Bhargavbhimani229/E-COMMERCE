@@ -29,4 +29,6 @@ catRouter.get("/singalPage/:id",catController.singalPage);
 
 catRouter.get("/logOut",catController.logOut);
 
+catRouter.get("/allSubCat/:id",catController.allSubCat);
+
 module.exports = catRouter;

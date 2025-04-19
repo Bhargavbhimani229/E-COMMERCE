@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flipkart Clone - Vivo Search</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f1f3f6;
+    }
+    .product-card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Added box shadow */
+      transition: box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .product-card:hover {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Hover effect for better shadow */
+    }
+    .product-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #333;
+    }
+    .product-price {
+      color: #388e3c;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .original-price {
+      text-decoration: line-through;
+      color: gray;
+      font-size: 0.9rem;
+    }
+    .discount {
+      color: green;
+      font-size: 0.9rem;
+    }
+    .rating {
+      background-color: #388e3c;
+      color: white;
+      font-size: 0.8rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .bestseller-badge {
+      background-color: #26a541;
+      color: white;
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-bottom: 5px;
+      display: inline-block;
+    }
+    /* Styling for the filter section */
+    .filter-section {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .filter-section h5, .filter-section h6 {
+      font-weight: bold;
+      color: #333;
+    }
+    .filter-section .form-check {
+      margin-bottom: 10px;
+    }
+    .filter-section .form-check-label {
+      color: #333;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    /* Cart Button */
+    .view-product-btn {
+      margin-top: 10px;
+      background-color: #ff5722;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 5px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <%- include('../partials/homeHeader') %>
+
+  <div class="container-fluid mt-3">
+    <div class="row">
+      <!-- Sidebar Filters -->
+      <div class="col-md-3">
+        <div class="filter-section">
+          <h5>Filters</h5>
+          <hr>
+          <h6>Categories</h6>
+          <p>Mobiles & Accessories</p>
+          <h6>Price</h6>
+          <input type="range" class="form-range">
+          <div class="d-flex justify-content-between">
+            <input type="number" class="form-control w-50" placeholder="Min">
+            <input type="number" class="form-control w-50 ms-2" placeholder="Max">
+          </div>
+          <h6 class="mt-3">Brand</h6>
+          <div>
+            <div class="form-check"><input type="checkbox" class="form-check-input" id="samsung"><label class="form-check-label" for="samsung">SAMSUNG</label></div>
+            <div class="form-check"><input type="checkbox" class="form-check-input" id="motorola"><label class="form-check-label" for="motorola">MOTOROLA</label></div>
+            <div class="form-check"><input type="checkbox" class="form-check-input" id="vivo"><label class="form-check-label" for="vivo">vivo</label></div>
+            <div class="form-check"><input type="checkbox" class="form-check-input" id="infinix"><label class="form-check-label" for="infinix">Infinix</label></div>
+            <div class="form-check"><input type="checkbox" class="form-check-input" id="poco"><label class="form-check-label" for="poco">POCO</label></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Listings -->
+      <div class="col-md-9">
+        <div class="product-grid">
+          <% if (extraCategories && extraCategories.length > 0) { %>
+            <% extraCategories.forEach(extra => { %>
+              <div class="product-card">
+                <img src="/<%= extra.image %>" alt="<%= extra.name %>" width="150" height="180" class="mb-3">
+                <% if (extra.isBestseller) { %>
+                  <div class="bestseller-badge">Bestseller</div>
+                <% } %>
+                <div class="product-title"><%= extra.name %></div>
+                <div class="rating mt-1">4.5★</div> <!-- Static rating for now -->
+
+                <ul class="mt-2 mb-1">
+                  <li><%= extra.ram || "6 GB RAM" %> | <%= extra.storage || "128 GB ROM" %></li>
+                  <li><%= extra.display || "17.07 cm (6.72 inch) Display" %></li>
+                  <li><%= extra.camera || "50MP + 2MP | 8MP Front Camera" %></li>
+                  <li><%= extra.battery || "6500 mAh Battery" %></li>
+                  <li><%= extra.processor || "Dimensity 7300 5G Processor" %></li>
+                </ul>
+
+                <div class="product-price">
+                  ₹<%= extra.price || "14,999" %> 
+                  <span class="original-price ms-2">₹<%= extra.originalPrice || "17,999" %></span> 
+                  <span class="discount ms-2"><%= extra.discount || "16% off" %></span>
+                </div>
+
+                <div class="text-success">Free delivery • Upto ₹8,000 Off on Exchange</div>
+                <div class="view-product-btn">View Product</div> <!-- Cart-like button -->
+              </div>
+            <% }) %>
+          <% } else { %>
+            <p>No products found under this subcategory.</p>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

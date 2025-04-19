@@ -21,22 +21,30 @@
           /><br />
           <%= cat.name %>
         </a>
-        
+
         <!-- Dropdown menu -->
         <ul class="dropdown-menu" aria-labelledby="dropdown<%= cat._id %>">
-          <% const relatedSub = subcategories.filter(sub => sub.categoryId._id.toString() === cat._id.toString()); %>
-          
+          <% 
+            const relatedSub = subcategories.filter(sub => 
+              sub.categoryId._id.toString() === cat._id.toString()
+            ); 
+          %>
+
           <% relatedSub.forEach(sub => { %>
-            <li class="dropdown-submenu px-2">
-              <a class="dropdown-item dropdown-toggle" href="#">
+            <li class="dropdown-submenu px-2 position-relative">
+              <a class="dropdown-item dropdown-toggle" href="/allSubCat/<%= sub._id %>">
                 <%= sub.subCatName %>
               </a>
-              
+
+              <!-- Nested Extra Categories -->
               <ul class="dropdown-menu">
-                <% const relatedExtra = extracategories.filter(extra =>
-                  (extra.subCategoriesId?._id?.toString() || extra.subCategoriesId?.toString()) === sub._id.toString()
-                ); %>
-                
+                <% 
+                  const relatedExtra = extracategories.filter(extra => {
+                    const subIdMatch = extra.subCategoriesId?._id?.toString() || extra.subCategoriesId?.toString();
+                    return subIdMatch === sub._id.toString();
+                  });
+                %>
+
                 <% relatedExtra.forEach(extra => { %>
                   <li>
                     <a class="dropdown-item" href="/singalPage/<%= extra._id %>">
@@ -115,6 +123,5 @@
     <% }) %>
   </div>
 </div>
-
 
 <%- include('../partials/homeFooter') %>

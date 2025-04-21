@@ -81,5 +81,5 @@ E-COMMERCE/
 
 ## 🙋‍♂️ Author
 
-Made with ❤️ by [Shubham Parekh]  
-📧 Email: Shubhamparekh04@gmail.com
+Made with ❤️ by [Bhargav Bhimani]  
+📧 Email: bhargavbhimani229@gmail.com

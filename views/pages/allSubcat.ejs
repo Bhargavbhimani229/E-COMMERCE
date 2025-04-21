@@ -131,7 +131,7 @@
                   <div class="bestseller-badge">Bestseller</div>
                 <% } %>
                 <div class="product-title"><%= extra.name %></div>
-                <div class="rating mt-1">4.5★</div> <!-- Static rating for now -->
+                <div class="rating mt-1" style="width: 40px;">4.5★</div> <!-- Static rating for now -->
 
                 <ul class="mt-2 mb-1">
                   <li><%= extra.ram || "6 GB RAM" %> | <%= extra.storage || "128 GB ROM" %></li>
@@ -148,7 +148,7 @@
                 </div>
 
                 <div class="text-success">Free delivery • Upto ₹8,000 Off on Exchange</div>
-                <div class="view-product-btn">View Product</div> <!-- Cart-like button -->
+                <a class="view-product-btn btn btn-primary" href="/singalPage">View Product</a> <!-- Cart-like button -->
               </div>
             <% }) %>
           <% } else { %>

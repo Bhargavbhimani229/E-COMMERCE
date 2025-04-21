@@ -3,6 +3,7 @@ const db = require("./configs/database");
 const passport = require("passport");
 const session = require("express-session");
 const { userLocalsData } = require("./middleware/passport");
+const isAuth = require("./middleware/isAuth")
 const app = express();
 const port = 8090;
 
@@ -18,7 +19,8 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// app.use(userLocalsData);
+app.use(isAuth);
+
 app.use(express.static("public"));
 app.use("/uploads", express.static(__dirname + "/uploads"));
 app.use("/", require("./routers/index"));

@@ -19,18 +19,18 @@ module.exports.loginPage = (req, res) => {
 
 module.exports.registerUser = async (req, res) => {
   try {
-    console.log(req.body.password);
-
     let { password, confirmPw } = req.body;
     if (password === confirmPw) {
       let user = await registerModel.create(req.body);
-      return res.render("pages/login", { user });
+      req.session.user = user;
+      return res.redirect("/");
     } else {
       console.log("Password & Confirm Password should be same!");
-      return res.render("pages/register", { user });
+      return res.render("pages/register", { user: null });
     }
   } catch (error) {
     console.log(error.message);
+    return res.render("pages/register", { user: null });
   }
 };
 
@@ -133,6 +133,7 @@ module.exports.flipkartPage = async (req, res) => {
       categories,
       subcategories,
       extracategories,
+      user: req.session.user || null,
     });
   } catch (error) {
     console.log("Error loading homepage:", error.message);
@@ -158,17 +159,20 @@ module.exports.singalPage = async (req, res) => {
   }
 };
 
-module.exports.logOut = (req,res) => {
-  return res.redirect("/login")
+module.exports.logOut = (req, res) => {
+  req.session.destroy((err) => {
+    if (err) console.log(err);
+    res.redirect("/login");
+  });
 }
 
 
-module.exports.allSubCat =async (req,res) => {
+module.exports.allSubCat = async (req, res) => {
   try {
     const subCatId = req.params.id;
-    
+
     const extraCategoryList = await extCatModel.find({ subCategoriesId: subCatId });
-    
+
     return res.render("pages/allSubCat", {
       extraCategories: extraCategoryList,
     });
@@ -177,3 +181,4 @@ module.exports.allSubCat =async (req,res) => {
     return res.status(500).send("Server Error");
   }
 }
+

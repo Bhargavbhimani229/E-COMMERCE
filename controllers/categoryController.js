@@ -2,6 +2,7 @@ const CatModel = require("../models/catSchema");
 const extCatModel = require("../models/extraCategory");
 const registerModel = require("../models/registerShema");
 const subCatModel = require("../models/subCategory");
+const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken')
 const fs = require("fs");
 require("dotenv").config();
@@ -18,29 +19,54 @@ module.exports.loginPage = (req, res) => {
   return res.render("pages/login");
 };
 
+module.exports.adminLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const admin = await registerModel.findOne({ email });
+
+    if (!admin) {
+      return res.render("pages/login", { error: "Admin not found" });
+    }
+
+    const isMatch = await bcrypt.compare(password, admin.password);
+
+    if (!isMatch) {
+      return res.render("pages/login", { error: "Incorrect password" });
+    }
+
+    // Create JWT token
+    const token = jwt.sign(
+      { id: admin._id, role: admin.role },
+      process.env.SECRET_KEY,
+      { expiresIn: "1h" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax'
+    });
+    console.log("Admin logged in successfully!");
+    return res.redirect("index");
+  } catch (error) {
+    console.log(error);
+    return res.render("index");
+  }
+};
+
 module.exports.registerUser = async (req, res) => {
   try {
-    let { password, confirmPw, email } = req.body;
-    if (password === confirmPw) {
-      let user = await registerModel.create(req.body);
-
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-        expiresIn: '7d',
-      });
-
-      res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-      });
-
-      return res.redirect("/");
-    } else {
-      console.log("Password & Confirm Password should be same!");
-      return res.render("pages/register", { user: null });
-    }
+    let hashPwd = await bcrypt.hash(req.body.password, 10);
+    await registerModel.create({
+      ...req.body,
+      password: hashPwd,
+      role: "admin", 
+    });
+    console.log("Admin created successfully!");
+    return res.redirect("/login");
   } catch (error) {
-    console.log(error.message);
-    return res.render("pages/register", { user: null });
+    console.log(error);
+    return res.render("pages/register");
   }
 };
 
@@ -171,12 +197,10 @@ module.exports.singalPage = async (req, res) => {
 };
 
 module.exports.logOut = (req, res) => {
-  res.clearCookie('token');
-  req.session.destroy((err) => {
-    if (err) console.log(err);
+  res.clearCookie("token");
     res.redirect("/login");
-  });
-}
+  };
+
 
 
 module.exports.allSubCat = async (req, res) => {

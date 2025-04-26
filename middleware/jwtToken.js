@@ -1,36 +1,32 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/registerShema');
+require("dotenv").config();
 
-const protect = async (req, res, next) => {
-  let token;
-
-  // 1) Check Authorization header
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-    token = req.headers.authorization.split(' ')[1];
-  } 
-  // 2) Then check Cookies
-  else if (req.cookies.token) {
-    token = req.cookies.token;
-  }
-
+// 1. Token Authentication
+const authenticateToken = (req, res, next) => {
+  const token = req.cookies.token || req.headers.authorization;
+  console.log("Token:", token); 
   if (!token) {
-    return res.status(401).json({ message: 'Not authorized, no token' });
+    return res.redirect("/login");
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id).select('-password');
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    req.user = decoded;
     next();
-  } catch (err) {
-    res.status(401).json({ message: 'Not authorized, token failed' });
+  } catch (error) {
+    return res.redirect("/login");
   }
 };
 
-const adminOnly = (req, res, next) => {
-  if (!req.user || req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Access denied: Admins only!' });
-  }
-  next();
+// 2. Admin Verification
+const verifyAdmin = (req, res, next) => {
+  authenticateToken(req, res, () => {
+    if (req.user && req.user.role === "admin") {
+      next();
+    } else {
+      return res.redirect("/login");
+    }
+  });
 };
 
-module.exports = { protect, adminOnly };
+module.exports = { authenticateToken, verifyAdmin };

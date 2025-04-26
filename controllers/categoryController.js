@@ -2,8 +2,9 @@ const CatModel = require("../models/catSchema");
 const extCatModel = require("../models/extraCategory");
 const registerModel = require("../models/registerShema");
 const subCatModel = require("../models/subCategory");
+const jwt = require('jsonwebtoken')
 const fs = require("fs");
-
+require("dotenv").config();
 
 module.exports.homePage = (req, res) => {
   return res.render("index");
@@ -19,10 +20,19 @@ module.exports.loginPage = (req, res) => {
 
 module.exports.registerUser = async (req, res) => {
   try {
-    let { password, confirmPw } = req.body;
+    let { password, confirmPw, email } = req.body;
     if (password === confirmPw) {
       let user = await registerModel.create(req.body);
-      req.session.user = user;
+
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: '7d',
+      });
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+      });
+
       return res.redirect("/");
     } else {
       console.log("Password & Confirm Password should be same!");
@@ -146,6 +156,7 @@ module.exports.flipkartPage = async (req, res) => {
 };
 
 
+
 module.exports.singalPage = async (req, res) => {
   try {
     const extraCategory = await extCatModel.findById(req.params.id);
@@ -160,6 +171,7 @@ module.exports.singalPage = async (req, res) => {
 };
 
 module.exports.logOut = (req, res) => {
+  res.clearCookie('token');
   req.session.destroy((err) => {
     if (err) console.log(err);
     res.redirect("/login");
@@ -170,7 +182,6 @@ module.exports.logOut = (req, res) => {
 module.exports.allSubCat = async (req, res) => {
   try {
     const subCatId = req.params.id;
-
     const extraCategoryList = await extCatModel.find({ subCategoriesId: subCatId });
 
     return res.render("pages/allSubCat", {
@@ -181,4 +192,5 @@ module.exports.allSubCat = async (req, res) => {
     return res.status(500).send("Server Error");
   }
 }
+
 

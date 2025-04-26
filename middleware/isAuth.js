@@ -1,5 +1,9 @@
 module.exports = (req, res, next) => {
-    res.locals.user = req.session.user || null;
-    next();
-  };
-  
+  // Ensure that req.user is available
+  if (req.user) {
+    res.locals.user = req.user; // Set user to locals for the view
+  } else {
+    res.locals.user = null; // No user, nullify
+  }
+  next();
+};
